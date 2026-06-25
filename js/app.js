@@ -92,7 +92,16 @@ function addHistoryBadge(number) {
     const badge = document.createElement('span');
     badge.className = 'history-badge';
     badge.textContent = number;
+    badge.title = 'Clic para marcar como no v\u00e1lido';
+    badge.addEventListener('click', () => toggleInvalid(badge));
     historyGrid.appendChild(badge);
+}
+
+function toggleInvalid(badge) {
+    badge.classList.toggle('invalid');
+    badge.title = badge.classList.contains('invalid')
+        ? 'Clic para marcar como v\u00e1lido'
+        : 'Clic para marcar como no v\u00e1lido';
 }
 
 function updateRemaining() {
