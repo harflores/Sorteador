@@ -72,6 +72,7 @@ function pickWinner() {
         <span class="winner-number">${winner}</span>
     `;
 
+    launchConfetti();
     addHistoryBadge(winner);
     updateRemaining();
 
@@ -120,4 +121,83 @@ function resetAll() {
     btnDraw.disabled = val > 0 ? false : true;
     isDrawing = false;
     poolInitialized = val > 0;
+}
+
+function launchConfetti() {
+    const canvas = document.createElement('canvas');
+    canvas.className = 'confetti-canvas';
+    document.body.appendChild(canvas);
+    const ctx = canvas.getContext('2d');
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const colors = ['#F5A800', '#FFD054', '#C58800', '#FF6B6B', '#4ECDC4', '#FFFFFF', '#FF4081', '#7C4DFF'];
+    const shapes = ['rect', 'circle', 'strip'];
+    const PARTICLE_COUNT = 150;
+    const DURATION = 3000;
+    const particles = [];
+
+    for (let i = 0; i < PARTICLE_COUNT; i++) {
+        particles.push({
+            x: canvas.width / 2 + (Math.random() - 0.5) * 200,
+            y: canvas.height / 2,
+            vx: (Math.random() - 0.5) * 18,
+            vy: Math.random() * -18 - 4,
+            color: colors[Math.floor(Math.random() * colors.length)],
+            shape: shapes[Math.floor(Math.random() * shapes.length)],
+            size: Math.random() * 8 + 4,
+            rotation: Math.random() * 360,
+            rotationSpeed: (Math.random() - 0.5) * 12,
+            gravity: 0.25 + Math.random() * 0.15,
+            opacity: 1,
+            wobble: Math.random() * 10
+        });
+    }
+
+    const start = performance.now();
+
+    function animate(now) {
+        const elapsed = now - start;
+        if (elapsed > DURATION) {
+            canvas.remove();
+            return;
+        }
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        const fadeStart = DURATION * 0.7;
+        const globalAlpha = elapsed > fadeStart ? 1 - (elapsed - fadeStart) / (DURATION - fadeStart) : 1;
+
+        particles.forEach(p => {
+            p.x += p.vx;
+            p.vy += p.gravity;
+            p.y += p.vy;
+            p.vx *= 0.99;
+            p.rotation += p.rotationSpeed;
+            p.x += Math.sin(p.wobble + elapsed * 0.003) * 0.5;
+
+            ctx.save();
+            ctx.globalAlpha = globalAlpha * p.opacity;
+            ctx.translate(p.x, p.y);
+            ctx.rotate((p.rotation * Math.PI) / 180);
+            ctx.fillStyle = p.color;
+
+            if (p.shape === 'rect') {
+                ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.6);
+            } else if (p.shape === 'circle') {
+                ctx.beginPath();
+                ctx.arc(0, 0, p.size / 2, 0, Math.PI * 2);
+                ctx.fill();
+            } else {
+                ctx.fillRect(-p.size / 2, -1, p.size, 3);
+            }
+
+            ctx.restore();
+        });
+
+        requestAnimationFrame(animate);
+    }
+
+    requestAnimationFrame(animate);
 }
