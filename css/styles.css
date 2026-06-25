@@ -290,6 +290,20 @@ main {
     font-weight: 600;
 }
 
+footer {
+    width: 100%;
+    padding: 1.5rem 1rem;
+    text-align: center;
+    margin-top: auto;
+}
+
+footer p {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    letter-spacing: 0.5px;
+}
+
 .confetti-canvas {
     position: fixed;
     top: 0;
